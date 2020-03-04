@@ -13,6 +13,7 @@ dash-core-components==1.8.1
 dash-html-components==1.0.2
 dash-renderer==1.2.4
 dash-table==4.6.1
+dataclasses==0.6
 decorator==4.4.2
 dnspython==1.16.0
 empyrical==0.5.3
