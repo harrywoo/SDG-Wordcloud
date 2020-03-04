@@ -55,7 +55,10 @@ def encode_image(image_file):
 
 filePath = r"SDG outliers_specific (no rank)_results"
 files = os.listdir(filePath)
-files.remove('.DS_Store')
+try:
+    files.remove('.DS_Store')
+except:
+    print("VERROR")
 SDG_info = []
 update_SDG_info = []
 company = []
