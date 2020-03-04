@@ -86,6 +86,7 @@ company = sorted(set(company))
 colors = {'background': '#111111', 'text': '#7FDBFF','button':'#FFFF00'}
 
 app = dash.Dash()
+server = app.server
 #app.css.append_css({'remove'})
 app.layout = html.Div(
     children = [
