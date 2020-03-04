@@ -1,0 +1,8 @@
+#SDGnumber .Select--multi .Select-value {
+  background-color: #666060;
+  color: #666060;
+}
+
+#SDGnumber .VirtualizedSelectFocusedOption {
+  background-color: #d1ccc7;
+}
