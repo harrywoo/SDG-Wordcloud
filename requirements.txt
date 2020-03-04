@@ -20,6 +20,7 @@ eventkit==0.8.6
 Flask==1.1.1
 Flask-Compress==1.4.0
 future==0.18.2
+gunicorn==20.0.4
 ib-insync==0.9.59
 idna==2.9
 inflection==0.3.1
