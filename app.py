@@ -64,8 +64,9 @@ date = []
 SDG = []
 for i in files:
     path = 'SDG outliers_specific (no rank)_results/' + i
-    inf = os.listdir(path)
-    SDG_info.extend(inf)
+    if os.path.isdir(path):
+        inf = os.listdir(path)
+        SDG_info.extend(inf)
 for i  in SDG_info:
     if 'pdf' in i:
         update_SDG_info.append(i)
@@ -156,18 +157,87 @@ app.layout = html.Div(
         html.Br(),
         html.Br(),
         # graph
-        html.H6('Visualized Results:', style = {'color' : colors['text'],
-                                                'margin-left': 10,
-                                                'width' : '30%'}),
-        html.Div(html.Img(id = 'Graph', style = {}), style = {'margin-left': 300,'margin-right': 10})]
-                 , style = {'backgroundColor': colors['background'], 'height':'100vh'})
-
+        html.Div(id="graph-container", children=[
+            html.H6('Visualized Results:', style={'color': colors['text'],
+                                                  'margin-left': 10,
+                                                  'width': '30%'}),
+            html.Div(html.Img(id='Graph', style={}), style={
+                'margin-left': 300, 'margin-right': 10}),
+            html.Div(dcc.Graph(id='urlTable')),
+            html.Div(dcc.Graph(id='timeTable'))], style={'display':'block'})
+    ], style={'backgroundColor': colors['background'], 'height': '100vh'})
 image_dir = 'images/'
+csv_dir = 'SDG outliers_specific (no rank)_results/'
+
+
+@app.callback(
+    Output('graph-container', 'style'),
+    [Input('SDGnumber', 'value'), Input('company_name', 'value'), Input('date', 'value')])
+def hide_graph(SDG_number, company_name, date):
+    filename = image_dir+f'{SDG_number}_{company_name}_{date}.png'
+    if os.path.exists(filename):
+        return {'display': 'block'}
+    else:
+        return {'display': 'none'}
+
 
 @app.callback(
     Output('Graph', 'src'),
-    [Input('SDGnumber', 'value'), Input('company_name','value'), Input('date','value')])
-def update_graph(SDG_number,company_name,date):
+    [Input('SDGnumber', 'value'), Input('company_name', 'value'), Input('date', 'value')])
+def update_graph(SDG_number, company_name, date):
     return encode_image(image_dir+f'{SDG_number}_{company_name}_{date}.png')
+
+
+@app.callback(
+    Output('urlTable', 'figure'),
+    [Input('SDGnumber', 'value'), Input('company_name', 'value'), Input('date', 'value')])
+def update_table(SDG_number, company_name, date):
+    SDG_number = re.findall("\d+", SDG_number)[0]
+    SDG_dir = csv_dir + "SDG"+str(SDG_number)+" result(unranked)/"
+    file_names = os.listdir(SDG_dir)
+    p_url = re.compile(company_name+r'\ all\ url.+\.csv')
+    url_filename = [s for s in file_names if p_url.match(s)][0]
+    url_df = pd.read_csv(SDG_dir+url_filename)
+    data = go.Table(
+        header=dict(values=['Link'],
+                    line_color='darkslategray',
+                    fill_color='lightskyblue',
+                    align='left'),
+        cells=dict(values=url_df.T.iloc[1:],  # 2nd column
+                   line_color='darkslategray',
+                   fill_color='lightcyan',
+                   align='left'))
+    layout = go.Layout(plot_bgcolor=colors['background'],
+                       paper_bgcolor=colors['background'], title=dict(text='Url Link',
+                                                                      font=dict(color='white')), height=600)
+    return {"data": [data], "layout": layout}
+
+
+@app.callback(
+    Output('timeTable', 'figure'),
+    [Input('SDGnumber', 'value'), Input('company_name', 'value'), Input('date', 'value')])
+def update_table(SDG_number, company_name, date):
+    SDG_number = re.findall("\d+", SDG_number)[0]
+    SDG_dir = csv_dir + "SDG"+str(SDG_number)+" result(unranked)/"
+    file_names = os.listdir(SDG_dir)
+    p_time = re.compile(company_name+r'\ time.+\.csv')
+
+    time_filename = [s for s in file_names if p_time.match(s)][0]
+    time_df = pd.read_csv(SDG_dir+time_filename)
+    data = go.Table(
+        header=dict(values=['Index', 'Company', 'Date', 'SDG'],
+                    line_color='darkslategray',
+                    fill_color='lightskyblue',
+                    align='left'),
+        cells=dict(values=time_df.T,  # 2nd column
+                   line_color='darkslategray',
+                   fill_color='lightcyan',
+                   align='left'))
+    layout = go.Layout(plot_bgcolor=colors['background'],
+                       paper_bgcolor=colors['background'], title=dict(text='Time Series',
+                                                                      font=dict(color='white')), height=600)
+    return {"data": [data], "layout": layout}
+
+
 if __name__ == '__main__':
     app.run_server()
