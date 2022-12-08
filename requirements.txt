@@ -2,7 +2,7 @@ appnope==0.1.0
 backcall==0.1.0
 backtrader==1.9.74.123
 beautifulsoup4==4.8.2
-certifi==2019.11.28
+certifi==2022.12.7
 chardet==3.0.4
 chart-studio==1.0.0
 Click==7.0
